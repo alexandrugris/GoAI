@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/GoAI.iml" filepath="$PROJECT_DIR$/GoAI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/plt/plt.iml" filepath="$PROJECT_DIR$/plt/plt.iml" />
+    </modules>
+  </component>
+</project>
