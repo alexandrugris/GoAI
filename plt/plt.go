@@ -11,37 +11,43 @@ import (
 )
 
 type Plot struct {
-	Type string
+	Type   string
 	Values [][]float64
-	Name string
-	Count int
+	Name   string
+	Count  int
 }
 
 var plots []Plot = nil
 var tmpl *template.Template = nil
 
 func min(a int, b int) int {
-	if a < b {return a} else {return b}
+	if a < b {
+		return a
+	} else {
+		return b
+	}
 }
 
-func compressByMean(count int, arr []float64) []float64{
+func compressByMean(count int, arr []float64) []float64 {
 
 	ret := make([]float64, count)
+	intvLen := len(arr) / count
+	cnt := float64(intvLen)
 
-	for i := 0; i < count; i++ {
+	for i := 0; i < count-1; i++ {
 
-		upperLimit := min( (i + 1) * count, len(arr) - i * count)
-		cnt := upperLimit - i * count
+		upperLimit := (i + 1) * intvLen
+		lowerLimit := i * intvLen
 
-		ret[i] = arr[i*count] / float64(cnt)
+		ret[i] = arr[lowerLimit] / cnt
 
-		for j := i * count + 1; j < upperLimit; j ++ {
-			ret[i] += arr[j] / float64(cnt)
+		for j := lowerLimit + 1; j < upperLimit; j++ {
+			ret[i] += arr[j] / cnt
 		}
 	}
 
 	// last one is the last value - a hack for the simulated annealing problem
-	ret[count - 1] = arr[len(arr) - 1]
+	ret[count-1] = arr[len(arr)-1]
 	return ret
 }
 
@@ -49,47 +55,48 @@ func toPythonArray(arr []float64) string {
 	sb := strings.Builder{}
 	sb.WriteString("[")
 
-	for i, v := range arr{
+	for i, v := range arr {
 		sb.WriteString(fmt.Sprintf("%f", v))
-		if i < len(arr) {sb.WriteString(", ")}
+		if i < len(arr) {
+			sb.WriteString(", ")
+		}
 	}
 
 	sb.WriteString("]")
 	return sb.String()
 }
 
-func init(){
+func init() {
 
 	log.Println(os.Getwd())
 
 	fn := template.FuncMap{
-		"CompressByMean" : compressByMean,
-		"ToPythonArray" : toPythonArray,
+		"CompressByMean": compressByMean,
+		"ToPythonArray":  toPythonArray,
 	}
 
-	tmpl = template.Must(template.New("chart_template.py").Funcs(fn).ParseFiles("chart_template.py"))
+	tmpl = template.Must(template.New("chart_template.gopy").Funcs(fn).ParseFiles("chart_template.gopy"))
 }
 
+func LinePlot(arr []float64, name string, count int) {
 
-func LinePlot(arr []float64, name string, count int){
-
-	v := Plot {
-		Type: "line",
+	v := Plot{
+		Type:   "line",
 		Values: make([][]float64, 1),
-		Name: name,
-		Count: count,
+		Name:   name,
+		Count:  count,
 	}
 
 	v.Values[0] = arr
 	plots = append(plots, v)
 }
 
-func Reset(){
+func Reset() {
 	// clear the plots
 	plots = nil
 }
 
-func Execute(){
+func Execute() {
 
 	var fileName string
 
@@ -104,7 +111,7 @@ func Execute(){
 		defer f.Close()
 		*fn = f.Name()
 
-		if err:= tmpl.Execute(f, plots); err != nil{
+		if err := tmpl.Execute(f, plots); err != nil {
 			log.Panic(err)
 		}
 

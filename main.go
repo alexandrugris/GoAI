@@ -202,7 +202,7 @@ func TravellingSalesman(in <-chan []Point, out chan<- *ConnsCollection) {
 		}
 
 		plt.Reset()
-		plt.LinePlot(distanceEvolution, "Distance Evolution", 100)
+		plt.LinePlot(distanceEvolution, "Distance Evolution", 1000)
 
 		if d > dReset {
 			out <- resetPoint
